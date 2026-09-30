@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# C extensions
+*.obj
+*.o
+*.pyd
+
+# Environments
+.env
+.env.*
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Explicit exclusion of Microsoft Word documents and Tutorial Sheet deliverables
+*.docx
+*.doc
+Tutorial_Sheet/
+Tutorial_Sheet.docx
+*.tmp

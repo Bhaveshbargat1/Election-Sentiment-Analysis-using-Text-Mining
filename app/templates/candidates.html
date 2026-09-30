@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Analytics | Election Social Media Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-users text-primary me-2"></i>Candidate & Political Party Sentiment Analytics
+        </h2>
+        <p class="text-muted mb-0">
+            Comparative analysis of voter approval, sentiment polarity, and social engagement across competing political figures.
+        </p>
+    </div>
+</div>
+
+<!-- Candidate Cards Row -->
+<div class="row g-4 mb-4">
+    {% for c in candidates %}
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">{{ c.name }}</h5>
+                    <small class="text-primary fw-semibold">{{ c.party }}</small>
+                </div>
+                <div class="avatar-circle bg-primary-subtle text-primary fw-bold">
+                    {{ c.name[-1] }}
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Net Sentiment Score Highlight -->
+                <div class="p-3 rounded-3 mb-3 text-center
+                    {% if c.net_sentiment_score > 0 %}bg-success-subtle border border-success-subtle text-success
+                    {% elif c.net_sentiment_score < 0 %}bg-danger-subtle border border-danger-subtle text-danger
+                    {% else %}bg-secondary-subtle border border-secondary-subtle text-secondary{% endif %}">
+                    <span class="small text-uppercase fw-bold">Net Sentiment Score (NSS)</span>
+                    <h2 class="fw-bold mb-0">
+                        {% if c.net_sentiment_score > 0 %}+{% endif %}{{ c.net_sentiment_score }}%
+                    </h2>
+                </div>
+
+                <!-- Sentiment Progress Bar -->
+                <label class="small fw-bold text-muted mb-1">Sentiment Distribution</label>
+                <div class="progress mb-2" style="height: 14px;">
+                    <div class="progress-bar bg-success" style="width: {{ c.pos_pct }}%" title="Positive: {{ c.pos_pct }}%"></div>
+                    <div class="progress-bar bg-secondary" style="width: {{ c.neu_pct }}%" title="Neutral: {{ c.neu_pct }}%"></div>
+                    <div class="progress-bar bg-danger" style="width: {{ c.neg_pct }}%" title="Negative: {{ c.neg_pct }}%"></div>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted small mb-3">
+                    <span class="text-success"><i class="fa-solid fa-thumbs-up me-1"></i>{{ c.positive }} ({{ c.pos_pct }}%)</span>
+                    <span class="text-secondary"><i class="fa-solid fa-circle-minus me-1"></i>{{ c.neutral }} ({{ c.neu_pct }}%)</span>
+                    <span class="text-danger"><i class="fa-solid fa-thumbs-down me-1"></i>{{ c.negative }} ({{ c.neg_pct }}%)</span>
+                </div>
+
+                <hr class="text-muted">
+
+                <!-- Engagement Stats -->
+                <div class="row g-2 text-center">
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="text-muted d-block small" style="font-size: 0.75rem;">Total Posts</span>
+                            <span class="fw-bold text-dark">{{ c.total_mentions }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="text-muted d-block small" style="font-size: 0.75rem;">Avg Likes</span>
+                            <span class="fw-bold text-dark">{{ c.avg_likes }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="text-muted d-block small" style="font-size: 0.75rem;">Avg Retweets</span>
+                            <span class="fw-bold text-dark">{{ c.avg_retweets }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Comparative Visualization Row -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-chart-bar text-primary me-2"></i>Comparative Sentiment Visualization by Candidate
+            </h5>
+            <img src="{{ url_for('static', filename='images/candidate_sentiment.png') }}" class="img-fluid rounded border" alt="Comparative Sentiment Chart">
+        </div>
+    </div>
+</div>
+{% endblock %}

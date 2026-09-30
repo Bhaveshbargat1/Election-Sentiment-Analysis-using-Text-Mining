@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Election Social Media Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-chart-line text-primary me-2"></i>Election Sentiment Mining Dashboard
+        </h2>
+        <p class="text-muted mb-0">
+            Real-time Natural Language Processing and text mining insights across social media election discourse.
+        </p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('main.predict') }}" class="btn btn-primary px-3 shadow-sm me-2">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Live Text Miner
+        </a>
+        <a href="{{ url_for('main.explorer') }}" class="btn btn-outline-secondary px-3 shadow-sm">
+            <i class="fa-solid fa-database me-1"></i> View Dataset
+        </a>
+    </div>
+</div>
+
+<!-- Key Stat Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm rounded-3 bg-white h-100 p-3">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-primary-subtle text-primary me-3">
+                    <i class="fa-solid fa-comments fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Total Posts Analyzed</span>
+                    <h3 class="fw-bold text-dark mb-0">{{ total_tweets }}</h3>
+                    <small class="text-success"><i class="fa-solid fa-check-circle"></i> Cleaned & Lemmatized</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm rounded-3 bg-white h-100 p-3">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-success-subtle text-success me-3">
+                    <i class="fa-solid fa-face-smile fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Positive Sentiment</span>
+                    <h3 class="fw-bold text-success mb-0">{{ pos_pct }}%</h3>
+                    <small class="text-muted">{{ pos_count }} favorable tweets</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm rounded-3 bg-white h-100 p-3">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-danger-subtle text-danger me-3">
+                    <i class="fa-solid fa-face-frown fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Negative Sentiment</span>
+                    <h3 class="fw-bold text-danger mb-0">{{ neg_pct }}%</h3>
+                    <small class="text-muted">{{ neg_count }} critical tweets</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm rounded-3 bg-white h-100 p-3">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon bg-secondary-subtle text-secondary me-3">
+                    <i class="fa-solid fa-scale-balanced fs-4"></i>
+                </div>
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Neutral / Informative</span>
+                    <h3 class="fw-bold text-secondary mb-0">{{ neu_pct }}%</h3>
+                    <small class="text-muted">{{ neu_count }} neutral / polling updates</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="row g-4 mb-4">
+    <!-- Candidate Scoreboard -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fa-solid fa-users-viewfinder text-primary me-2"></i>Candidate Sentiment Scoreboard
+                </h5>
+                <a href="{{ url_for('main.candidates') }}" class="btn btn-sm btn-link text-decoration-none">
+                    Deep Dive <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Candidate & Party</th>
+                                <th>Volume</th>
+                                <th style="width: 35%;">Sentiment Breakdown</th>
+                                <th class="text-center">Net Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidate_stats %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ c.candidate }}</div>
+                                    <small class="text-muted">{{ c.party }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ c.total }}</span>
+                                </td>
+                                <td>
+                                    {% set pos_p = (c.positive / c.total * 100)|round(1) if c.total else 0 %}
+                                    {% set neu_p = (c.neutral / c.total * 100)|round(1) if c.total else 0 %}
+                                    {% set neg_p = (c.negative / c.total * 100)|round(1) if c.total else 0 %}
+                                    <div class="progress" style="height: 12px;" title="Pos: {{ pos_p }}% | Neu: {{ neu_p }}% | Neg: {{ neg_p }}%">
+                                        <div class="progress-bar bg-success" style="width: {{ pos_p }}%"></div>
+                                        <div class="progress-bar bg-secondary" style="width: {{ neu_p }}%"></div>
+                                        <div class="progress-bar bg-danger" style="width: {{ neg_p }}%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.75rem;">
+                                        <span class="text-success"><i class="fa-solid fa-plus-circle"></i> {{ pos_p }}%</span>
+                                        <span class="text-secondary">{{ neu_p }}%</span>
+                                        <span class="text-danger"><i class="fa-solid fa-minus-circle"></i> {{ neg_p }}%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if c.net_sentiment_score > 0 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
+                                        +{{ c.net_sentiment_score }}%
+                                    </span>
+                                    {% elif c.net_sentiment_score < 0 %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold">
+                                        {{ c.net_sentiment_score }}%
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 fw-bold">
+                                        0.0%
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light py-2 px-4 small text-muted">
+                <i class="fa-solid fa-circle-info me-1"></i> Net Sentiment Score (NSS) = % Positive Posts - % Negative Posts
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Election Policy Issues / Topics -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fa-solid fa-bullhorn text-primary me-2"></i>Trending Election Topics
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Key public issues discussed by voters across social media channels:</p>
+                <div class="list-group list-group-flush">
+                    {% for top in topic_stats %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-primary rounded-circle p-2 me-3" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;">
+                                {{ loop.index }}
+                            </span>
+                            <div>
+                                <span class="fw-semibold text-dark">{{ top.topic }}</span>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
+                            {{ top.count }} mentions
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-microchip text-primary fs-3 me-3"></i>
+                        <div>
+                            <div class="small fw-bold text-dark">Production Classifier</div>
+                            <div class="text-muted small">Active Model: <strong>{{ best_model_name }}</strong> (TF-IDF N-grams)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualizations Row -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Sentiment Distribution Overview</h6>
+            <img src="{{ url_for('static', filename='images/sentiment_distribution.png') }}" class="img-fluid rounded border" alt="Sentiment Distribution">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-column text-primary me-2"></i>Candidate Sentiment Comparison</h6>
+            <img src="{{ url_for('static', filename='images/candidate_sentiment.png') }}" class="img-fluid rounded border" alt="Candidate Sentiment">
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Text Analytics & Architecture | Election Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-cloud text-primary me-2"></i>Text Analytics & System Architecture
+        </h2>
+        <p class="text-muted mb-0">
+            Exploration of prominent lexical patterns, word clouds, and the complete data mining system workflow.
+        </p>
+    </div>
+</div>
+
+<!-- Architecture Diagram Card -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-sitemap text-primary me-2"></i>End-to-End System Architecture Flowchart
+        </h5>
+    </div>
+    <div class="card-body text-center p-4">
+        <img src="{{ url_for('static', filename='images/architecture_diagram.png') }}" class="img-fluid rounded border shadow-sm" alt="System Architecture Flowchart" style="max-height: 520px;">
+        <p class="text-muted small mt-3 mb-0">
+            System pipeline showing data ingestion &rarr; multi-stage NLP preprocessing &rarr; TF-IDF feature engineering &rarr; ML classification &rarr; analytics layer &rarr; Flask web dashboard & REST API.
+        </p>
+    </div>
+</div>
+
+<!-- Word Clouds Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 h-100 p-3">
+            <h5 class="fw-bold text-success mb-3">
+                <i class="fa-solid fa-cloud-arrow-up text-success me-2"></i>Positive Sentiment Word Cloud
+            </h5>
+            <img src="{{ url_for('static', filename='images/wordcloud_positive.png') }}" class="img-fluid rounded border" alt="Positive Word Cloud">
+            <p class="text-muted small mt-2 mb-0">
+                Frequent terms: <em>inspiring, leadership, future, vision, growth, job, reform, healthcare, clean politics</em>.
+            </p>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 h-100 p-3">
+            <h5 class="fw-bold text-danger mb-3">
+                <i class="fa-solid fa-cloud-arrow-down text-danger me-2"></i>Negative Sentiment Word Cloud
+            </h5>
+            <img src="{{ url_for('static', filename='images/wordcloud_negative.png') }}" class="img-fluid rounded border" alt="Negative Word Cloud">
+            <p class="text-muted small mt-2 mb-0">
+                Frequent terms: <em>disappointed, inflation, crisis, fail, blunder, corruption, empty promise, broken, unemployment</em>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Text Mining Pipeline Mechanics -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-gears text-primary me-2"></i>Text Mining Methodology & Mathematical Foundations
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary">1. Term Frequency - Inverse Document Frequency (TF-IDF)</h6>
+                <p class="small text-muted">
+                    TF-IDF evaluates the importance of a word in a document relative to a corpus. High weights are assigned to terms that occur frequently in a specific tweet but rarely across the general corpus.
+                </p>
+                <div class="p-3 bg-light rounded border font-monospace small">
+                    \[ \text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \log\left(\frac{1 + |D|}{1 + |\{d \in D : t \in d\}|}\right) + 1 \]
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold text-primary">2. VADER Lexicon-Based Sentiment Scoring</h6>
+                <p class="small text-muted">
+                    VADER (Valence Aware Dictionary and sEntiment Reasoner) incorporates grammatical rules, punctuation emphasis (e.g., "!!"), capitalization, and degree modifiers (e.g., "extremely", "marginally") to calculate a normalized compound score from -1 to +1.
+                </p>
+                <div class="p-3 bg-light rounded border font-monospace small">
+                    \[ \text{Compound Score} = \frac{x}{\sqrt{x^2 + \alpha}}, \quad \text{where } \alpha = 15 \]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

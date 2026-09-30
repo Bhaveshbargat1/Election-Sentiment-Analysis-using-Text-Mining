@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Model Evaluation & Benchmarks | Election Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-square-poll-vertical text-primary me-2"></i>Machine Learning Model Evaluation & Benchmarks
+        </h2>
+        <p class="text-muted mb-0">
+            Comparative performance analysis of supervised text classification algorithms on the election sentiment test partition.
+        </p>
+    </div>
+</div>
+
+<!-- Active Champion Model Banner -->
+<div class="alert alert-primary border-primary-subtle d-flex align-items-center mb-4 rounded-3 p-3">
+    <i class="fa-solid fa-trophy text-warning fs-3 me-3"></i>
+    <div>
+        <h6 class="fw-bold mb-0 text-dark">Active Production Model: <span class="text-primary">{{ best_model_name }}</span></h6>
+        <small class="text-muted">Selected based on top weighted F1-score across all 3 sentiment classes (Positive, Negative, Neutral).</small>
+    </div>
+</div>
+
+<!-- Benchmark Table Card -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-table-list text-primary me-2"></i>Algorithms Benchmark Comparison (Test Split = 20%)
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Algorithm / Model</th>
+                        <th class="text-center">Accuracy</th>
+                        <th class="text-center">Weighted Precision</th>
+                        <th class="text-center">Weighted Recall</th>
+                        <th class="text-center">Weighted F1-Score</th>
+                        <th class="text-center">Macro F1-Score</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m_name, m_data in models.items() %}
+                    <tr {% if m_name == best_model_name %}class="table-primary-subtle fw-semibold"{% endif %}>
+                        <td class="ps-4">
+                            <span class="text-dark">{{ m_name }}</span>
+                            {% if m_name == best_model_name %}
+                            <span class="badge bg-primary text-white ms-2">Champion</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border">{{ (m_data.accuracy * 100)|round(2) }}%</span>
+                        </td>
+                        <td class="text-center">{{ (m_data.precision * 100)|round(2) }}%</td>
+                        <td class="text-center">{{ (m_data.recall * 100)|round(2) }}%</td>
+                        <td class="text-center">
+                            <strong class="text-success">{{ (m_data.f1_score * 100)|round(2) }}%</strong>
+                        </td>
+                        <td class="text-center">{{ (m_data.macro_f1 * 100)|round(2) }}%</td>
+                        <td class="text-center">
+                            {% if m_name == best_model_name %}
+                            <span class="badge bg-success text-white"><i class="fa-solid fa-check-circle me-1"></i>Deploved</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary">Evaluated</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Visualization Graphs -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-column text-primary me-2"></i>Performance Benchmark Comparison</h6>
+            <img src="{{ url_for('static', filename='images/model_comparison.png') }}" class="img-fluid rounded border" alt="Model Comparison Chart">
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-table-cells text-primary me-2"></i>Confusion Matrix (Champion Model: {{ best_model_name }})</h6>
+            <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" class="img-fluid rounded border" alt="Confusion Matrix">
+        </div>
+    </div>
+</div>
+
+<!-- Theory & Evaluation Metrics Guide -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-book-open text-primary me-2"></i>Evaluation Metrics Definition & Data Mining Rationale
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light">
+                    <h6 class="fw-bold text-primary mb-1">Accuracy</h6>
+                    <p class="small text-muted mb-0">Total correct predictions over all test samples. \( \text{Acc} = \frac{TP + TN}{TP + TN + FP + FN} \)</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light">
+                    <h6 class="fw-bold text-success mb-1">Precision</h6>
+                    <p class="small text-muted mb-0">Proportion of predicted positive instances that are truly positive. \( \text{Prec} = \frac{TP}{TP + FP} \)</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light">
+                    <h6 class="fw-bold text-danger mb-1">Recall (Sensitivity)</h6>
+                    <p class="small text-muted mb-0">Proportion of actual positive instances correctly classified. \( \text{Rec} = \frac{TP}{TP + FN} \)</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 border rounded-3 bg-light">
+                    <h6 class="fw-bold text-info mb-1">F1-Score</h6>
+                    <p class="small text-muted mb-0">Harmonic mean of Precision and Recall. \( F_1 = 2 \times \frac{\text{Prec} \times \text{Rec}}{\text{Prec} + \text{Rec}} \)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

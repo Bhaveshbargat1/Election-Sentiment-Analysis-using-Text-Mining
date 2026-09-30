@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset Explorer | Election Social Media Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-database text-primary me-2"></i>Social Media Dataset Explorer
+        </h2>
+        <p class="text-muted mb-0">
+            Browse, search, and filter the processed election tweets corpus with ground truth and metadata.
+        </p>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body p-4">
+        <form method="GET" action="{{ url_for('main.explorer') }}" class="row g-3 align-items-end">
+            <!-- Candidate Filter -->
+            <div class="col-md-3">
+                <label for="candidate" class="form-label small fw-bold text-secondary">Candidate Filter:</label>
+                <select name="candidate" id="candidate" class="form-select">
+                    {% for cand in all_candidates %}
+                    <option value="{{ cand }}" {% if candidate_filter == cand %}selected{% endif %}>{{ cand }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sentiment Filter -->
+            <div class="col-md-3">
+                <label for="sentiment" class="form-label small fw-bold text-secondary">Sentiment Class:</label>
+                <select name="sentiment" id="sentiment" class="form-select">
+                    {% for s in all_sentiments %}
+                    <option value="{{ s }}" {% if sentiment_filter == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Search Query -->
+            <div class="col-md-4">
+                <label for="q" class="form-label small fw-bold text-secondary">Keyword Search:</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Search tweet text..." value="{{ search_query }}">
+                </div>
+            </div>
+
+            <!-- Submit & Reset -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                <a href="{{ url_for('main.explorer') }}" class="btn btn-outline-secondary" title="Reset Filters"><i class="fa-solid fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+            Showing {{ records|length }} of {{ total_records }} tweets
+        </h5>
+        <span class="badge bg-light text-dark border">Page {{ page }} of {{ total_pages }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4" style="width: 12%;">ID & Date</th>
+                        <th style="width: 15%;">Author & Candidate</th>
+                        <th style="width: 15%;">Topic</th>
+                        <th>Tweet Text</th>
+                        <th style="width: 10%;">Engagement</th>
+                        <th class="text-center" style="width: 10%;">Sentiment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-bold text-dark font-monospace small">{{ r.tweet_id }}</span>
+                            <div class="text-muted small" style="font-size: 0.75rem;">{{ r.created_at[:10] }}</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary small">{{ r.author_handle }}</div>
+                            <span class="badge bg-light text-dark border" style="font-size: 0.7rem;">{{ r.candidate_mentioned }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary">{{ r.election_topic }}</span>
+                        </td>
+                        <td>
+                            <p class="mb-1 small text-dark">{{ r.raw_tweet_text }}</p>
+                            <small class="text-muted font-monospace" style="font-size: 0.72rem;">
+                                <strong>Tokens:</strong> {{ r.processed_text[:90] }}...
+                            </small>
+                        </td>
+                        <td>
+                            <small class="text-muted d-block"><i class="fa-solid fa-heart text-danger me-1"></i>{{ r.likes_count }}</small>
+                            <small class="text-muted d-block"><i class="fa-solid fa-retweet text-success me-1"></i>{{ r.retweets_count }}</small>
+                        </td>
+                        <td class="text-center">
+                            {% if r.ground_truth_sentiment == 'Positive' %}
+                            <span class="badge bg-success text-white px-2 py-1"><i class="fa-solid fa-face-smile me-1"></i>Positive</span>
+                            {% elif r.ground_truth_sentiment == 'Negative' %}
+                            <span class="badge bg-danger text-white px-2 py-1"><i class="fa-solid fa-face-frown me-1"></i>Negative</span>
+                            {% else %}
+                            <span class="badge bg-secondary text-white px-2 py-1"><i class="fa-solid fa-face-meh me-1"></i>Neutral</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-database fa-3x mb-3 text-secondary opacity-50"></i>
+                            <h5>No tweets match your search criteria</h5>
+                            <p class="small mb-0">Try clearing the search query or adjusting the filters.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if total_pages > 1 %}
+    <div class="card-footer bg-white border-top py-3 d-flex justify-content-center">
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.explorer', candidate=candidate_filter, sentiment=sentiment_filter, q=search_query, page=page-1) }}">Previous</a>
+                </li>
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('main.explorer', candidate=candidate_filter, sentiment=sentiment_filter, q=search_query, page=p) }}">{{ p }}</a>
+                    </li>
+                    {% elif p == page - 3 or p == page + 3 %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.explorer', candidate=candidate_filter, sentiment=sentiment_filter, q=search_query, page=page+1) }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

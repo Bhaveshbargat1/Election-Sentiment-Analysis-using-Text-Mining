@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Live Sentiment Predictor & Text Miner | Election Sentiment Mining{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>Live Sentiment Predictor & Text Miner
+        </h2>
+        <p class="text-muted mb-0">
+            Input any election tweet or social media text to inspect the full NLP preprocessing pipeline and multi-model sentiment predictions.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Input Section -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Enter Social Media Text
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.predict') }}">
+                    <div class="mb-3">
+                        <label for="tweet_text" class="form-label fw-semibold text-secondary">Election Tweet / Voter Comment:</label>
+                        <textarea class="form-control" id="tweet_text" name="tweet_text" rows="5" placeholder="e.g. Candidate A delivered an outstanding speech on healthcare and job reforms today! Truly inspiring vision for our future. #Election2026" required>{{ input_text }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="small fw-bold text-muted d-block mb-2">Try quick sample statements:</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-success sample-btn" 
+                                data-text="Candidate A delivered an outstanding speech on healthcare! Lower prescription costs and 500k new green jobs is exactly what working families need! #Election2026 #Leadership">
+                                <i class="fa-solid fa-thumbs-up me-1"></i> Positive Sample
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger sample-btn" 
+                                data-text="Deeply disappointed by Candidate B's economic proposal. Rising inflation and corruption allegations are alarming. Completely unacceptable! #EconomicWarning">
+                                <i class="fa-solid fa-thumbs-down me-1"></i> Negative Sample
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary sample-btn" 
+                                data-text="Election Notice: Candidate C is scheduled to hold a televised town hall on education and federal grants this Thursday at 3 PM. #Election2026 #PollTracker">
+                                <i class="fa-solid fa-circle-info me-1"></i> Neutral Sample
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="fa-solid fa-microchip me-2"></i>Analyze Text & Mine Sentiment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction Verdict Section -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fa-solid fa-square-poll-check text-primary me-2"></i>Sentiment Analysis Verdict
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if result and not result.error %}
+                    <!-- Top Result Banner -->
+                    <div class="text-center p-4 rounded-3 mb-4 
+                        {% if result.ml_prediction.sentiment == 'Positive' %}bg-success-subtle text-success border border-success-subtle
+                        {% elif result.ml_prediction.sentiment == 'Negative' %}bg-danger-subtle text-danger border border-danger-subtle
+                        {% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}">
+                        
+                        <div class="fs-1 mb-2">
+                            {% if result.ml_prediction.sentiment == 'Positive' %}<i class="fa-solid fa-face-smile-beam"></i>
+                            {% elif result.ml_prediction.sentiment == 'Negative' %}<i class="fa-solid fa-face-angry"></i>
+                            {% else %}<i class="fa-solid fa-face-meh"></i>{% endif %}
+                        </div>
+                        <h3 class="fw-bold mb-1">{{ result.ml_prediction.sentiment }} Sentiment</h3>
+                        <p class="mb-0 fw-medium">Machine Learning Confidence: <strong>{{ result.ml_prediction.confidence_score }}%</strong></p>
+                    </div>
+
+                    <!-- Multi-Perspective Analysis Cards -->
+                    <div class="row g-3">
+                        <!-- Supervised ML Card -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-brain text-primary me-1"></i> Supervised Classifier</div>
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>Class:</span> <strong class="text-dark">{{ result.ml_prediction.sentiment }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2 small">
+                                    <span>Confidence:</span> <strong>{{ result.ml_prediction.confidence_score }}%</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {% if result.ml_prediction.sentiment == 'Positive' %}bg-success{% elif result.ml_prediction.sentiment == 'Negative' %}bg-danger{% else %}bg-secondary{% endif %}" 
+                                         style="width: {{ result.ml_prediction.confidence_score }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VADER Lexicon Card -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-book text-warning me-1"></i> VADER Lexicon</div>
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>Verdict:</span> <strong>{{ result.vader_analysis.sentiment }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>Compound:</span> <strong>{{ result.vader_analysis.compound }}</strong>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    Pos: {{ result.vader_analysis.positive }} | Neu: {{ result.vader_analysis.neutral }} | Neg: {{ result.vader_analysis.negative }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- TextBlob Card -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-compass text-info me-1"></i> TextBlob Analytics</div>
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>Polarity:</span> <strong>{{ result.textblob_analysis.polarity }}</strong> (-1 to +1)
+                                </div>
+                                <div class="d-flex justify-content-between small">
+                                    <span>Subjectivity:</span> <strong>{{ result.textblob_analysis.subjectivity }}</strong>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.75rem;">Type: {{ result.textblob_analysis.interpretation }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Entity Card -->
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light h-100">
+                                <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-tag text-purple me-1"></i> Detected Entities</div>
+                                <div>
+                                    {% for ent in result.entities %}
+                                    <span class="badge bg-primary text-white mb-1">{{ ent }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif result and result.error %}
+                    <div class="alert alert-warning">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ result.error }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-arrow-left fa-3x mb-3 text-secondary opacity-50"></i>
+                        <h5>No text analyzed yet</h5>
+                        <p class="small mb-0">Enter an election statement or click one of the quick samples on the left to see the prediction results.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if result and not result.error %}
+<!-- NLP Preprocessing Pipeline Step-by-Step Inspector -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fa-solid fa-diagram-project text-primary me-2"></i>Text Mining & NLP Preprocessing Pipeline (Step-by-Step Inspection)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">Pipeline Stage</th>
+                                <th style="width: 25%;">Operation Performed</th>
+                                <th>Transformed Output</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-secondary"><i class="fa-solid fa-file-lines me-2"></i>1. Raw Input</td>
+                                <td>Original social media post as fetched from platform</td>
+                                <td class="font-monospace text-wrap">{{ result.preprocessing.original }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary"><i class="fa-solid fa-font me-2"></i>2. Contraction Expansion</td>
+                                <td>Normalize contractions (e.g., won't &rarr; will not, can't &rarr; cannot)</td>
+                                <td class="font-monospace text-wrap">{{ result.preprocessing.expanded_contractions }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary"><i class="fa-solid fa-broom me-2"></i>3. Regex Cleaning</td>
+                                <td>Stripped URLs, mentions (@user), numbers, and punctuation</td>
+                                <td class="font-monospace text-wrap">{{ result.preprocessing.cleaned }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary"><i class="fa-solid fa-list-ol me-2"></i>4. Tokenization</td>
+                                <td>Segmented cleaned string into individual lowercase tokens</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for t in result.preprocessing.tokens %}
+                                        <span class="badge bg-light text-dark border">{{ t }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary"><i class="fa-solid fa-filter me-2"></i>5. Stopwords Removal</td>
+                                <td>Eliminated non-discriminative grammatical words (NLTK corpus)</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for t in result.preprocessing.stopwords_removed %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ t }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-success"><i class="fa-solid fa-seedling me-2"></i>6. Lemmatization</td>
+                                <td>Reduced remaining tokens to morphological root base words (WordNet)</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for t in result.preprocessing.lemmatized_tokens %}
+                                        <span class="badge bg-success text-white">{{ t }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-light">
+                                <td class="fw-bold text-primary"><i class="fa-solid fa-vector-square me-2"></i>7. Final Mining String</td>
+                                <td>Processed text passed directly into TF-IDF Vectorizer & Classifier</td>
+                                <td class="font-monospace fw-bold text-primary">{{ result.preprocessing.processed_text }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.sample-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('tweet_text').value = this.getAttribute('data-text');
+    });
+});
+</script>
+{% endblock %}

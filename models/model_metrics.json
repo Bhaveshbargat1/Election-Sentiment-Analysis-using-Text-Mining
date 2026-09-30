@@ -1,0 +1,266 @@
+{
+    "best_model_name": "Logistic Regression",
+    "classes": [
+        "Negative",
+        "Neutral",
+        "Positive"
+    ],
+    "models": {
+        "Logistic Regression": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "macro_precision": 1.0,
+            "macro_recall": 1.0,
+            "macro_f1": 1.0,
+            "confusion_matrix": [
+                [
+                    105,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    81,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    114
+                ]
+            ],
+            "classes": [
+                "Negative",
+                "Neutral",
+                "Positive"
+            ],
+            "detailed_report": {
+                "Negative": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 105.0
+                },
+                "Neutral": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 81.0
+                },
+                "Positive": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 114.0
+                },
+                "accuracy": 1.0,
+                "macro avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                },
+                "weighted avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                }
+            }
+        },
+        "Multinomial Naive Bayes": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "macro_precision": 1.0,
+            "macro_recall": 1.0,
+            "macro_f1": 1.0,
+            "confusion_matrix": [
+                [
+                    105,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    81,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    114
+                ]
+            ],
+            "classes": [
+                "Negative",
+                "Neutral",
+                "Positive"
+            ],
+            "detailed_report": {
+                "Negative": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 105.0
+                },
+                "Neutral": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 81.0
+                },
+                "Positive": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 114.0
+                },
+                "accuracy": 1.0,
+                "macro avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                },
+                "weighted avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                }
+            }
+        },
+        "Linear SVM": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "macro_precision": 1.0,
+            "macro_recall": 1.0,
+            "macro_f1": 1.0,
+            "confusion_matrix": [
+                [
+                    105,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    81,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    114
+                ]
+            ],
+            "classes": [
+                "Negative",
+                "Neutral",
+                "Positive"
+            ],
+            "detailed_report": {
+                "Negative": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 105.0
+                },
+                "Neutral": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 81.0
+                },
+                "Positive": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 114.0
+                },
+                "accuracy": 1.0,
+                "macro avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                },
+                "weighted avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                }
+            }
+        },
+        "Random Forest": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "macro_precision": 1.0,
+            "macro_recall": 1.0,
+            "macro_f1": 1.0,
+            "confusion_matrix": [
+                [
+                    105,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    81,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    114
+                ]
+            ],
+            "classes": [
+                "Negative",
+                "Neutral",
+                "Positive"
+            ],
+            "detailed_report": {
+                "Negative": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 105.0
+                },
+                "Neutral": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 81.0
+                },
+                "Positive": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 114.0
+                },
+                "accuracy": 1.0,
+                "macro avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                },
+                "weighted avg": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1-score": 1.0,
+                    "support": 300.0
+                }
+            }
+        }
+    }
+}
